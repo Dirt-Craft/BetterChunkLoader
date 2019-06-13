@@ -153,8 +153,10 @@ public class BetterChunkLoader {
             plugin.getDataStore().removeChunkLoader(chunkLoader.getUniqueId());
             return chunkLoader;
         }).map((_item) -> 1).reduce(count, Integer::sum);
-        if (count > 0) {
+        if (count > 1) {
             getLogger().warn(count  + " chunks were purged!");
+        } else if (count == 1) {
+            getLogger().warn(count  + " chunk was purged!");
         } else {
             getLogger().info("No chunks were purged!");
         }
