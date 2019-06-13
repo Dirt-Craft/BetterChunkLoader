@@ -32,6 +32,7 @@ import org.spongepowered.api.service.pagination.PaginationService;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Plugin(
@@ -123,6 +124,7 @@ public class BetterChunkLoader {
     @Listener
     public void onServerStopping(GameStoppingServerEvent event) throws IOException, ObjectMappingException {
         //saveData();
+        purgeChunks();
         getDataStore().getChunkLoaderData().stream().forEachOrdered((cl) -> {
             getChunkManager().unloadChunkLoader(cl);
         });
@@ -141,6 +143,20 @@ public class BetterChunkLoader {
             if (chunk.isLoadable()) {
                 plugin.getChunkManager().unloadChunkLoader(chunk);
             }
+        }
+    }
+
+    private void purgeChunks() {
+        List<ChunkLoader> chunkLoaders = plugin.getDataStore().getChunkLoaderData();
+        int count = 0;
+        count = chunkLoaders.stream().filter((chunkLoader) -> (!chunkLoader.blockCheck())).map((chunkLoader) -> {
+            plugin.getDataStore().removeChunkLoader(chunkLoader.getUniqueId());
+            return chunkLoader;
+        }).map((_item) -> 1).reduce(count, Integer::sum);
+        if (count > 0) {
+            getLogger().warn(count  + " chunks were purged!");
+        } else {
+            getLogger().info("No chunks were purged!");
         }
     }
 
