@@ -7,11 +7,9 @@ import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
+import org.spongepowered.api.text.serializer.TextSerializers;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class Info implements CommandExecutor {
 
@@ -30,7 +28,8 @@ public class Info implements CommandExecutor {
             return CommandResult.success();
         }
 
-        Integer alwaysOnLoaders = 0, onlineOnlyLoaders = 0, alwaysOnChunks = 0, onlineOnlyChunks = 0, maxChunksCount = 0, playerCount = 0;
+        int alwaysOnLoaders = 0, onlineOnlyLoaders = 0, alwaysOnChunks = 0, onlineOnlyChunks = 0, maxChunksCount = 0, playerCount = 0;
+
         HashMap<UUID, Integer> loadedChunksForPlayer = new HashMap<>();
 
         for (ChunkLoader chunkLoader : chunkLoaders) {
@@ -66,8 +65,11 @@ public class Info implements CommandExecutor {
         args.put("playerCount", String.valueOf(playerCount));
 
         plugin.getPaginationService().builder()
-                .contents(Utilities.parseMessageList(plugin.getConfig().getMessages().chunksInfoItems, args))
-                .title(Utilities.parseMessage(plugin.getConfig().getMessages().infoTitle))
+                .contents(Utilities.parseMessageList(
+                        Arrays.asList("&6{onlineLoaders} &aOnline &7Loaders &7loading &6{onlineChunks} chunks&r",
+                                "&6{alwaysOnLoaders} &cOffline &7Loaders &7loading &6{alwaysOnChunks} chunks&r",
+                                "&6{playerCount} &7players loading chunks&r"), args))
+                .title(TextSerializers.FORMATTING_CODE.deserialize("&cDirt&8-&6Loader &7Statistics"))
                 .padding(Utilities.parseMessage(plugin.getConfig().getMessages().infoPadding))
                 .sendTo(sender);
 

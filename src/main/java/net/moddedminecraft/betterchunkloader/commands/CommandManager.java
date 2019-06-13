@@ -110,8 +110,9 @@ public class CommandManager {
         // /bcl list
         CommandSpec cmdList = CommandSpec.builder()
                 .executor(new ListSelf(this.plugin))
+                .arguments(GenericArguments.optional(GenericArguments.user(Text.of("player"))))
                 .child(cmdListAll, "all")
-                .child(cmdListAlwaysOn, "alwayson")
+                .child(cmdListAlwaysOn, "alwayson", "offline")
                 .child(cmdListOnline, "online")
                 .permission(Permissions.COMMAND_LIST + ".base")
                 .build();

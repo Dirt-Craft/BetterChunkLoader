@@ -41,21 +41,25 @@ public class Menu {
             args.put("player", playerData.getName());
             args.put("chunks", chunkLoader.getChunks().toString());
 
-            Text mainTitle = Utilities.parseMessage(BetterChunkLoader.getInstance().getConfig().getMessages().menuTitleActive, args);
-            Text alwaysOnTitle = Utilities.parseMessage(BetterChunkLoader.getInstance().getConfig().getMessages().menuAlwaysOnTitle);
-            Text onlineTitle = Utilities.parseMessage(BetterChunkLoader.getInstance().getConfig().getMessages().menuOnlineTitle);
+            Text mainTitle = Utilities.format(
+                    "&4" + playerData.getName() + "&8 - &9" + chunkLoader.getChunks() + " &8Chunks");
+
+            Text alwaysOnTitle = Utilities.format("&4DirtCraft&7: &8Offline Loader");
+            Text onlineTitle = Utilities.format("&4DirtCraft&7: &8Online Loader");
 
             Text title = (chunkLoader.getRadius() != -1 ? mainTitle : chunkLoader.isAlwaysOn() ? alwaysOnTitle : onlineTitle);
+
             Inventory inventory = Inventory.builder()
                     .of(InventoryArchetypes.MENU_ROW)
                     .property(InventoryTitle.PROPERTY_NAME, InventoryTitle.of(Text.of(title)))
                     .property(MenuProperty.PROPERTY_NAME, MenuProperty.of(chunkLoader))
                     .listener(ClickInventoryEvent.class, createMenuListener(chunkLoader))
                     .build(plugin);
+
             if (chunkLoader.getRadius() != -1) {
                 SlotPos slotPos = SlotPos.of(0, 0);
                 HashMap<Key, Object> keys = new HashMap<>();
-                keys.put(Keys.DISPLAY_NAME, Text.of("Remove"));
+                keys.put(Keys.DISPLAY_NAME, Utilities.format("&c&oRemove &7&oDirt&8&o-&7&oLoader"));
                 addMenuOption(inventory, slotPos, REMOVE_TYPE, keys, slotPos.getX(), slotPos.getY(), -1, -1);
             }
 
@@ -81,13 +85,15 @@ public class Menu {
     }
 
     public void updateMenu(Player player, ChunkLoader chunkLoader, Inventory inventory) {
+
         plugin.getDataStore().getPlayerDataFor(chunkLoader.getOwner()).ifPresent((playerData) -> {
             if (chunkLoader.getRadius() != -1) {
                 SlotPos slotPos = SlotPos.of(0, 0);
                 HashMap<Key, Object> keys = new HashMap<>();
-                keys.put(Keys.DISPLAY_NAME, Text.of("Remove"));
+                keys.put(Keys.DISPLAY_NAME, Utilities.format("&c&oRemove &7&oDirt&8&o-&7&oLoader"));
                 addMenuOption(inventory, slotPos, REMOVE_TYPE, keys, slotPos.getX(), slotPos.getY(), -1, -1);
             }
+
 
             int pos = 2;
             int maxRadius = 7;
@@ -106,32 +112,31 @@ public class Menu {
                 pos++;
                 radius++;
             }
+
             player.openInventory(inventory);
         });
     }
 
     private Text getReadableSize(int i, boolean active) {
-        String status = "";
-        if (active) {
-            status = " [Active]";
-        }
+        String status = active ? "&9 - &d&oActive" : "";
+
         switch (i) {
             case 1:
-                return Utilities.parseMessage(plugin.getConfig().getMessages().menuChunkTitle1 + status);
+                return Utilities.format("&7Size&8: &61&7x&61 &7Chunk" + status);
             case 2:
-                return Utilities.parseMessage(plugin.getConfig().getMessages().menuChunkTitle2 + status);
+                return Utilities.format("&7Size&8: &63&7x&63 &7Chunks" + status);
             case 3:
-                return Utilities.parseMessage(plugin.getConfig().getMessages().menuChunkTitle3 + status);
+                return Utilities.format("&7Size&8: &65&7x&65 &7Chunks" + status);
             case 4:
-                return Utilities.parseMessage(plugin.getConfig().getMessages().menuChunkTitle4 + status);
+                return Utilities.format("&7Size&8: &67&7x&67 &7Chunk" + status);
             case 5:
-                return Utilities.parseMessage(plugin.getConfig().getMessages().menuChunkTitle5 + status);
+                return Utilities.format("&7Size&8: &69&7x&69 &7Chunk" + status);
             case 6:
-                return Utilities.parseMessage(plugin.getConfig().getMessages().menuChunkTitle6 + status);
+                return Utilities.format("&7Size&8: &611&7x&611 &7Chunk" + status);
             case 7:
-                return Utilities.parseMessage(plugin.getConfig().getMessages().menuChunkTitle7 + status);
+                return Utilities.format("&7Size&8: &613&7x&613 &7Chunk" + status);
             default:
-                return Utilities.parseMessage("Size: " + i);
+                return Utilities.format("&7Size&8: " + i);
         }
     }
 
@@ -141,6 +146,7 @@ public class Menu {
         };
     }
 
+    @Deprecated
     public void addMenuOption(Inventory inventory, SlotPos slotPos, ItemType icon, HashMap<Key, Object> keys, int x, int y, int radius, int chunks) {
         ItemStack itemStack = ItemStack.builder().itemType(icon).quantity(1).build();
 

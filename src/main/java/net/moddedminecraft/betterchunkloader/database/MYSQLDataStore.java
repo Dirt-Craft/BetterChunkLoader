@@ -4,7 +4,6 @@ import com.flowpowered.math.vector.Vector3i;
 import com.zaxxer.hikari.HikariDataSource;
 import net.moddedminecraft.betterchunkloader.BetterChunkLoader;
 import net.moddedminecraft.betterchunkloader.Permissions;
-import net.moddedminecraft.betterchunkloader.Utilities;
 import net.moddedminecraft.betterchunkloader.data.ChunkLoader;
 import net.moddedminecraft.betterchunkloader.data.PlayerData;
 import org.spongepowered.api.Sponge;
@@ -424,8 +423,8 @@ public final class MYSQLDataStore implements IDataStore {
         } else {
             final PlayerData playerData = plugin.getDataStore().getPlayerDataFor(uuid).get();
 
-            int alwaysonavailable = Utilities.getChunkCountFromSubject(player, "alwayson-chunks") + playerData.getAlwaysOnChunks();
-            int onlineavailable = Utilities.getChunkCountFromSubject(player, "online-chunks") + playerData.getOnlineChunks();
+            int alwaysonavailable = plugin.getConfig().getCore().defaultAlwaysOn + playerData.getAlwaysOnChunks();
+            int onlineavailable = plugin.getConfig().getCore().defaultOnline + playerData.getOnlineChunks();
 
             for (ChunkLoader chunk : plugin.getDataStore().getChunkLoaderData()) {
                 if (chunk.getOwner().equals(playerData.getUnqiueId())) {

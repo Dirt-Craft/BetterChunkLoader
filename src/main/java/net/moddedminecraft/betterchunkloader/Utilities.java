@@ -5,7 +5,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.profile.GameProfileManager;
-import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
@@ -23,6 +22,10 @@ import java.util.regex.Pattern;
 public class Utilities {
     
     private static final Pattern URL_PATTERN = Pattern.compile("((https?|ftp|gopher|telnet|file):((//)|(\\\\))+[\\w\\d:#@%/;$()~_?\\+-=\\\\\\.&]*)", Pattern.CASE_INSENSITIVE);
+
+    public static Text format(String unformattedString) {
+        return TextSerializers.FORMATTING_CODE.deserialize(unformattedString);
+    }
 
     public static Text parseMessage(String message) {
         return parseMessage(message, new HashMap<>());
@@ -121,19 +124,4 @@ public class Utilities {
         return Optional.empty();
     }
 
-    public static Integer getChunkCountFromSubject(Subject subject, String key) {
-        String option = subject.getOption(subject.getActiveContexts(), key).orElse(null);
-        if (option != null) {
-            try {
-                int value = Integer.parseInt(option);
-                if (value < 0) {
-                    value = 0;
-                }
-                return value;
-            } catch (NumberFormatException e) {
-                return 0;
-            }
-        }
-        return 0;
-    }
 }

@@ -8,7 +8,6 @@ import net.moddedminecraft.betterchunkloader.Utilities;
 import net.moddedminecraft.betterchunkloader.data.ChunkLoader;
 import net.moddedminecraft.betterchunkloader.data.PlayerData;
 import net.moddedminecraft.betterchunkloader.menu.Menu;
-import org.apache.commons.lang3.StringUtils;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
@@ -70,7 +69,7 @@ public class ListOnline implements CommandExecutor {
 
         plugin.getPaginationService().builder()
                 .contents(readableCLs)
-                .title(Utilities.parseMessage(plugin.getConfig().getMessages().chunksListTitleOnlineOnly))
+                .title(Utilities.format("&bOnline &7Dirt&8-&7Loaders"))
                 .padding(Utilities.parseMessage(plugin.getConfig().getMessages().chunksListPadding))
                 .sendTo(sender);
 
@@ -81,7 +80,7 @@ public class ListOnline implements CommandExecutor {
     public Text getReadableChunkLoader(ChunkLoader chunkLoader, CommandSource sender) {
         Optional<PlayerData> playerData = plugin.getDataStore().getPlayerDataFor(chunkLoader.getOwner());
 
-        String type = chunkLoader.isAlwaysOn() ? "Always On" : "Online Only";
+        String type = chunkLoader.isAlwaysOn() ? "Offline" : "Online";
         String loaded = chunkLoader.isLoadable() ? "&aTrue" : "&cFalse";
         String playerName = "null";
 
@@ -90,7 +89,7 @@ public class ListOnline implements CommandExecutor {
             playerName = playerData.get().getName();
         }
 
-        HashMap<String, String> args = new HashMap<>();
+        /*HashMap<String, String> args = new HashMap<>();
         args.put("ownerabr", StringUtils.abbreviate(playerName, 11));
         args.put("owner", playerName);
         args.put("type", type);
@@ -98,27 +97,37 @@ public class ListOnline implements CommandExecutor {
         args.put("radius", chunkLoader.getRadius().toString());
         args.put("chunks", chunkLoader.getChunks().toString());
         args.put("loaded", loaded);
-        args.put("server", chunkLoader.getServer());
+        args.put("server", SpongeDiscordLib.getServerName());*/
+
+        ArrayList<String> hover = new ArrayList<>();
+        hover.add("&7Owner&8: &6" + playerName);
+        hover.add("&7Type&8: &6" + type);
+        hover.add("&7Location&8: &6" +
+                Utilities.getReadableLocation(chunkLoader.getWorld(), chunkLoader.getLocation())
+                        .replace("world", "World"));
+        hover.add("&7Radius&8: &6" + chunkLoader.getRadius().toString());
+        hover.add("&7Chunks&8: &6" + chunkLoader.getChunks().toString());
+        hover.add("&7Loaded&8: " + loaded);
 
         Text.Builder send = Text.builder();
 
         if (sender instanceof Player) {
             Player player = (Player) sender;
             if (chunkLoader.canEdit(player)) {
-                send.append(Text.builder().append(Utilities.parseMessage(plugin.getConfig().getMessages().chunksListEditAction))
+                send.append(Text.builder().append(Utilities.format("&7[&bEdit&7]"))
                         .onClick(TextActions.executeCallback(editLoader(chunkLoader)))
-                        .onHover(TextActions.showText(Utilities.parseMessage(plugin.getConfig().getMessages().chunksListHoverEditAction))).build());
-                send.append(Utilities.parseMessage(" &f- "));
+                        .onHover(TextActions.showText(Utilities.format("&5&nClick Me&7 to edit this &6Dirt Loader"))).build());
+                send.append(Utilities.parseMessage("&r &8- "));
             }
         }
 
         if (sender.hasPermission(Permissions.TELEPORT)) {
-            send.append(Utilities.parseMessageList(plugin.getConfig().getMessages().chunksListOnline, args))
-                    .onHover(TextActions.showText(Utilities.parseMessage(plugin.getConfig().getMessages().chunksListHoverOnline, args)))
+            send.append(Utilities.format("&6" + playerName))
+                    .onHover(TextActions.showText(Utilities.format(String.join("\n", hover))))
                     .onClick(TextActions.executeCallback(teleportTo(chunkLoader.getWorld(), chunkLoader.getLocation())));
         } else {
-            send.append(Utilities.parseMessageList(plugin.getConfig().getMessages().chunksListOnline, args))
-                    .onHover(TextActions.showText(Utilities.parseMessage(plugin.getConfig().getMessages().chunksListHoverOnline, args)));
+            send.append(Utilities.format("&6" + playerName))
+                    .onHover(TextActions.showText(Utilities.format(String.join("\n", hover))));
         }
 
         return send.build();

@@ -37,9 +37,10 @@ import java.util.concurrent.TimeUnit;
 @Plugin(
         id = "betterchunkloader",
         name = "BetterChunkLoader",
-        description = "Fork of ShadowKittens Sponge port of KaiKikuchi's BetterChunkLoader plugin.",
+        description = "Fork of ModdedMinecraft's fork of ShadowKittens Sponge port of KaiKikuchi's BetterChunkLoader plugin.",
         authors = {
-                "leelawd93"
+                "leelawd93",
+                "juliann"
         },
         version = "2.1.2"
 )
