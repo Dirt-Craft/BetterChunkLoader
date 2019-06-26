@@ -1,5 +1,6 @@
 package net.moddedminecraft.betterchunkloader.commands;
 
+import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
 import net.moddedminecraft.betterchunkloader.BetterChunkLoader;
 import net.moddedminecraft.betterchunkloader.Permissions;
 import net.moddedminecraft.betterchunkloader.commands.list.ListAll;
@@ -140,8 +141,14 @@ public class CommandManager {
                 .permission(Permissions.COMMAND_TRANSFER + ".base")
                 .build();
 
+        // /bcl help
+        CommandSpec help = CommandSpec.builder()
+                .executor(new Help())
+                .build();
 
-        CommandSpec mclCmdSpec = CommandSpec.builder()
+
+        CommandSpec.Builder bclCmdSpec = CommandSpec.builder()
+                .executor(new BCL(this.plugin))
                 .child(cmdBalance, "balance", "bal")
                 .child(cmdInfo, "info", "i")
                 .child(cmdList, "list", "ls")
@@ -149,11 +156,13 @@ public class CommandManager {
                 .child(cmdDelete, "delete", "d")
                 .child(cmdPurge, "purge")
                 .child(cmdReload, "reload")
-                .child(cmdTransfer, "transfer")
-                .executor(new BCL(this.plugin))
-                .build();
-
-        Sponge.getCommandManager().register(this.plugin, mclCmdSpec, "net/moddedminecraft/betterchunkloader", "bcl", "mcl");
+                .child(cmdTransfer, "transfer");
+        if (SpongeDiscordLib.getServerName().toLowerCase().contains("pixel")) {
+            bclCmdSpec.child(help, "help");
+            Sponge.getCommandManager().register(this.plugin, bclCmdSpec.build(), "bcl", "chunkload", "load", "loader");
+        } else {
+            Sponge.getCommandManager().register(this.plugin, bclCmdSpec.build(), "bcl");
+        }
     }
 
 }
